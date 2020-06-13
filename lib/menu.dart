@@ -1,3 +1,4 @@
+import 'package:cachay/User/Profile.dart';
 import 'package:cachay/main.dart';
 import 'package:cachay/menu/cuenta.dart';
 import 'package:cachay/menu/game.dart';
@@ -8,24 +9,31 @@ import 'package:preload_page_view/preload_page_view.dart';
 class Menu extends StatefulWidget {
   @override
   _MenuState createState() => _MenuState();
+  final Profile profile;
+
+  Menu({
+    Key key,
+    @required this.profile,
+  }) : super(key: key);
 }
 
 class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   TabController tabcon;
   int selectedpage = 0;
-  var _pages = [
-    Inicio(),
-    Game(),
-    Rank(),
-    Cuenta()
-  ];
   PreloadPageController controlerpage = PreloadPageController();
-
+  var _pages;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     tabcon = new TabController(length: 4, vsync: this,initialIndex: 0);
+    print(widget.profile);
+     _pages= [
+      Inicio(profile: widget.profile,),
+      Game(),
+      Rank(),
+      Cuenta(profile: widget.profile,)
+    ];
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:cachay/main.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 class Game extends StatefulWidget {
   @override
@@ -117,6 +118,7 @@ class  GameState extends State <Game> {
         onPressed: (){
           switch(text){
             case "1v1":
+              Navigator.pushNamed(context, "/mainGame");
               break;
             case "1v3":
               break;
@@ -130,4 +132,5 @@ class  GameState extends State <Game> {
     );
 
   }
+
 }

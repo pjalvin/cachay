@@ -1,17 +1,28 @@
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cachay/User/Auth.dart';
+import 'package:cachay/User/Profile.dart';
+import 'package:cachay/alerts/Alerts.dart';
 import 'package:cachay/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 class Cuenta extends StatefulWidget {
+  final Profile profile;
   @override
   _CuentaState createState() => _CuentaState();
+  Cuenta({
+    Key key,
+    @required this.profile,
+  }) : super(key: key);
 }
 
 class _CuentaState extends State<Cuenta> {
-  String nombre="Pjalvin21341234";
-  String correo="pomaalvin@gmail.com";
   int avatar=1;
+
   @override
   Widget build(BuildContext context) {
     Size size=MediaQuery.of(context).size;
@@ -50,7 +61,7 @@ class _CuentaState extends State<Cuenta> {
                                 height:heigthpage*0.08,
                                 child:Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[Text(nombre,textAlign: TextAlign.right,style: TextStyle(color: color5,fontFamily: 'CenturyGothic',fontWeight: FontWeight.w300,fontSize: heigthpage*0.05),),
+                                  children: <Widget>[Text(widget.profile.nombre,textAlign: TextAlign.right,style: TextStyle(color: color5,fontFamily: 'CenturyGothic',fontWeight: FontWeight.w300,fontSize: heigthpage*0.05),),
                                   ],
                                 ) ),
                           Container(
@@ -59,7 +70,8 @@ class _CuentaState extends State<Cuenta> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 MaterialButton(
-                                  onPressed: (){},
+                                  onPressed: (){
+                                  },
                                   child: Text("editar",textAlign: TextAlign.right,style: TextStyle(color: color6,fontStyle: FontStyle.italic,fontFamily: 'CenturyGothic',fontWeight: FontWeight.w300,fontSize: heigthpage*0.025)
                                 ))
                                 ],
@@ -72,7 +84,7 @@ class _CuentaState extends State<Cuenta> {
                         width: size.width,
                         height: heigthpage*0.07,
                       child: Center(
-                        child: AutoSizeText(correo,textAlign: TextAlign.center,style: TextStyle(color: color6.withOpacity(0.3),fontFamily: 'CenturyGothic',fontSize: heigthpage*0.03),maxLines: 1,minFontSize:15,maxFontSize: 30,),
+                        child: AutoSizeText(widget.profile.email,textAlign: TextAlign.center,style: TextStyle(color: color6.withOpacity(0.3),fontFamily: 'CenturyGothic',fontSize: heigthpage*0.03),maxLines: 1,minFontSize:15,maxFontSize: 30,),
                       )
                     )
                   ],
@@ -94,7 +106,7 @@ class _CuentaState extends State<Cuenta> {
                             height: heigthpage*0.07,
                             child: Text('Cerrar Sesión',style: TextStyle(color: color6,fontFamily: 'CenturyGothic',fontSize: size.width*0.05),),
                             onPressed: (){
-
+                              AuthUser().cerrarSesion(context);
                             },
                           ),
                         ),
@@ -128,4 +140,6 @@ class _CuentaState extends State<Cuenta> {
         )
     );
   }
+
+
 }

@@ -26,6 +26,17 @@ dependencies:
   splashscreen: 1.2.0
   preload_page_view: ^0.1.4
   auto_size_text: ^2.1.0
+  flame: 0.22.0
+  firebase_auth: 0.16.1
+  google_sign_in:
+  firebase_messaging:
+  cloud_firestore:
+  firebase_core:
+  firebase_storage:
+  url_launcher: ^5.0.1
+  path_provider:
+  cloud_functions: 0.5.0
+  shared_preferences:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -49,6 +60,12 @@ flutter:
     - assets/iconos_rank/corona_1.png
     - assets/recursos/
     - assets/recursos/monedas.png
+    - assets/images/
+    - assets/images/tablero_1.jpg
+    - assets/images/sprites/
+    - assets/images/sprites/dado_sprite.png
+    - assets/images/dado1/
+    - assets/images/dado1/cara_6.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

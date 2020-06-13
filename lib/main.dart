@@ -1,4 +1,11 @@
+import 'package:cachay/User/Auth.dart';
+import 'package:cachay/alerts/Alerts.dart';
+import 'package:cachay/game/mainGame.dart';
 import 'package:cachay/menu.dart';
+import 'package:cachay/route_generator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
 
@@ -8,12 +15,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.light(
-
-      ),
       title: 'Cachay',
-
-      home: MainCacho()
+      onGenerateRoute: RouteGenerator.generateRoute,
+      initialRoute: '/',
     );
   }
 }
@@ -31,17 +35,56 @@ class MainCacho extends StatefulWidget {
 
 class _MainCachoState extends State<MainCacho> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //AuthUser().cerrarSesion(context);
+    AuthUser().verinicio(context);
+  }
+  @override
   Widget build(BuildContext context) {
     Size size=MediaQuery.of(context).size;
-    return SplashScreen(
+    return /*SplashScreen(
       backgroundColor: color2,
       photoSize: size.width*0.2,
       image: Image.asset("assets/logo.png",),
-      seconds: 3,
+      seconds: 60,
       loaderColor: color3,
 
-      navigateAfterSeconds: Menu()
+      navigateAfterSeconds: MyApp()
+    );*/
+    Scaffold(
+      backgroundColor: color2,
+      body: ListView(
+        children: <Widget>[
+          Container(
+            height: size.height*0.5,
+            width: size.width,
+            child:Center(
+              child: Image(image:AssetImage("assets/logo.png"),height: size.width*0.4,width: size.width*0.4,),
+            )
+
+          ),
+          Container(
+            height: size.height*0.5,
+            width: size.width*0.7,
+            child:Center(
+              child: LinearProgressIndicator(
+                  backgroundColor: color3,
+
+                  valueColor: new AlwaysStoppedAnimation<Color>(color5),
+              )
+              )
+          )
+        ],
+      ),
     );
   }
+
+
+
+
+
+
 }
 

@@ -1,17 +1,19 @@
 import 'dart:async';
 
+import 'package:cachay/User/Profile.dart';
 import 'package:cachay/main.dart';
 import 'package:flutter/material.dart';
 class Inicio extends StatefulWidget {
+  final Profile profile;
   @override
   _InicioState createState() => _InicioState();
+  Inicio({
+    Key key,
+    @required this.profile,
+  }) : super(key: key);
 }
 
 class _InicioState extends State<Inicio> {
-  int xp=1200;
-  int monedas=400;
-  int diamantes=400;
-  int gemas=200;
   List<String> tipo=["Principiante","Intermedio","Pro","Épico","Leyenda"];
   List<String> imgCoronas=["assets/iconos_rank/corona_1.png","assets/iconos_rank/corona_2.png","assets/iconos_rank/corona_3.png",
     "assets/iconos_rank/corona_4.png","assets/iconos_rank/corona_5.png"];
@@ -44,10 +46,18 @@ class _InicioState extends State<Inicio> {
 
   }
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+  }
+  @override
   void initState() {
     // TODO: implement initState
-    super.initState();
-    mover(-0.5);
+   if(this.mounted){
+     super.initState();
+     mover(-0.5);
+   }
   }
   @override
   Widget build(BuildContext context) {
@@ -67,7 +77,7 @@ class _InicioState extends State<Inicio> {
                   height: heigthpage*0.15,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children:[Text(xp.toString()+" XP",style: TextStyle(fontSize: size.height*0.05,color: color6),),]
+                    children:[Text(widget.profile.xp.toString()+" XP",style: TextStyle(fontSize: size.height*0.05,color: color6),),]
                   )
                 ),
                 Container(
@@ -76,7 +86,7 @@ class _InicioState extends State<Inicio> {
                     children: <Widget>[
                       Align(
                         alignment: Alignment(0, posiCorona*0.5),
-                        child: Image(image: AssetImage(imgCoronas[xp/1000<5?(xp/1000).truncate():5]),height: heigthpage*0.2-posiCorona*heigthpage*0.05,width: heigthpage*0.2-posiCorona*heigthpage*0.05,)
+                        child: Image(image: AssetImage(imgCoronas[widget.profile.xp/1000<5?(widget.profile.xp/1000).truncate():5]),height: heigthpage*0.2-posiCorona*heigthpage*0.05,width: heigthpage*0.2-posiCorona*heigthpage*0.05,)
                         ,
                       )
                     ],
@@ -87,7 +97,7 @@ class _InicioState extends State<Inicio> {
                   color: color3,
                   height: heigthpage*0.07,
                   child: Center(
-                    child: Text(tipo[xp/1000<5?(xp/1000).truncate():5],style: TextStyle(fontSize: size.height*0.03,color: color6,fontFamily: 'CenturyGothic',),),
+                    child: Text(tipo[widget.profile.xp/1000<5?(widget.profile.xp/1000).truncate():5],style: TextStyle(fontSize: size.height*0.03,color: color6,fontFamily: 'CenturyGothic',),),
                   )
                 )
               ],
@@ -103,8 +113,8 @@ class _InicioState extends State<Inicio> {
                   child:Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                        recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/monedas.png", monedas.toString()),
-                      recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/diamante.png", diamantes.toString())
+                        recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/monedas.png", widget.profile.oro.toString()),
+                      recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/diamante.png", widget.profile.diamantes.toString())
                     ],
                   )
                 ),
