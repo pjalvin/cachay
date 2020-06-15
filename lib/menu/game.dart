@@ -53,8 +53,8 @@ class  GameState extends State <Game> {
                            Row(
                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                              children: <Widget>[
-                               botonJuego(size.width*0.25, "assets/recursos/dados1.jpg", "1v1"),
-                               botonJuego(size.width*0.25, "assets/recursos/dados2.jpg", "1v3"),
+                               botonJuego(size.width*0.25, "assets/recursos/dados1.jpg", "1v1",size),
+                               botonJuego(size.width*0.25, "assets/recursos/dados2.jpg", "1v3",size),
                              ],
                            ),
                          ],
@@ -87,8 +87,8 @@ class  GameState extends State <Game> {
                      child: Row(
                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                        children: <Widget>[
-                         botonJuego(size.width*0.25, "assets/recursos/dados3.jpg", "+"),
-                         botonJuego(size.width*0.25, "assets/recursos/dados4.jpg", "a"),],
+                         botonJuego(size.width*0.25, "assets/recursos/dados3.jpg", "+",size),
+                         botonJuego(size.width*0.25, "assets/recursos/dados4.jpg", "a",size)],
                      ),
                    ),
                    Container(
@@ -106,7 +106,7 @@ class  GameState extends State <Game> {
       ),
     );
   }
-  Widget botonJuego(width,image,text){
+  Widget botonJuego(width,image,text,size){
     return Container(
       width: width,
       height: width,
@@ -118,7 +118,7 @@ class  GameState extends State <Game> {
         onPressed: (){
           switch(text){
             case "1v1":
-              Navigator.pushNamed(context, "/mainGame");
+              Navigator.pushNamed(context, "/mainGame",arguments: size);
               break;
             case "1v3":
               break;

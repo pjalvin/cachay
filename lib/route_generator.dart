@@ -24,10 +24,14 @@ class RouteGenerator {
         }
         return _errorRoute();
       case '/mainGame':
+        if(args is Size){
           return MaterialPageRoute(
             builder: (context) => MainGame(
-            ),
-          );
+              args
+            ),);
+          }
+        break;
+
       default:
         return _errorRoute();
     }
