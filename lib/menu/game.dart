@@ -1,3 +1,5 @@
+import 'package:cachay/game/componentes/Ayuda.dart';
+import 'package:cachay/game/funciones_cloud/Funcion.dart';
 import 'package:cachay/main.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ class Game extends StatefulWidget {
 }
 
 class  GameState extends State <Game> {
+  bool cargando=false;
   @override
   void initState() {
     // TODO: implement initState
@@ -115,10 +118,12 @@ class  GameState extends State <Game> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(width))),
         padding: EdgeInsets.all(0),
         child: text=="+"?Icon(Icons.add,color: color7.withOpacity(0.8),size:width*0.5):text=="a"?Icon(Icons.vpn_key,color: color7.withOpacity(0.8),size:width*0.4):Text(text,style: TextStyle(color: color7.withOpacity(0.8),fontSize:width*0.25)),
-        onPressed: (){
+        onPressed: ()async {
           switch(text){
             case "1v1":
-              Navigator.pushNamed(context, "/mainGame",arguments: size);
+              print("asdf1231234");
+              Navigator.pushNamed(context, "/espera",arguments: size);
+
               break;
             case "1v3":
               break;

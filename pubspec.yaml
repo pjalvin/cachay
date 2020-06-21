@@ -28,6 +28,7 @@ dependencies:
   auto_size_text: ^2.1.0
   flame: 0.22.0
   firebase_auth: 0.16.1
+  flutter_spinkit: 4.1.2+1
   google_sign_in:
   firebase_messaging:
   cloud_firestore:
@@ -37,6 +38,8 @@ dependencies:
   path_provider:
   cloud_functions: 0.5.0
   shared_preferences:
+  bloc: ^3.0.0
+  flutter_bloc: ^3.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

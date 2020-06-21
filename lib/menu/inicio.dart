@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cachay/User/Profile.dart';
+import 'package:cachay/game/componentes/Panel.dart';
 import 'package:cachay/main.dart';
 import 'package:flutter/material.dart';
 class Inicio extends StatefulWidget {
@@ -113,8 +114,8 @@ class _InicioState extends State<Inicio> {
                   child:Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                        recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/monedas.png", widget.profile.oro.toString()),
-                      recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/diamante.png", widget.profile.diamantes.toString())
+                        Panel().recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/monedas.png", widget.profile.oro.toString(),posiCorona),
+                      Panel().recurso(heigthpage*0.25,size.width*0.8, "assets/recursos/diamante.png", widget.profile.diamantes.toString(),posiCorona)
                     ],
                   )
                 ),
@@ -125,9 +126,9 @@ class _InicioState extends State<Inicio> {
                     children: [Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        botonCon(Icons.store, color5,color7,size.width*0.12),
+                        Panel().botonCon(Icons.store, color5,color7,size.width*0.12),
                         Divider(height:size.width*0.15,color: Colors.transparent,),
-                        botonCon(Icons.settings, color2,color6, size.width*0.12),
+                        Panel().botonCon(Icons.settings, color2,color6, size.width*0.12),
                       ],
                     ),]
                   )
@@ -139,45 +140,5 @@ class _InicioState extends State<Inicio> {
       )
     );
   }
-  Widget recurso(heigth,width,image,text){
-    return Container(
-      height: heigth,
-      width: width*0.5,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width:heigth*0.7+posiCorona*heigth*0.08,
-            height: image=="assets/recursos/diamante.png"?heigth*0.4+posiCorona*heigth*0.08:heigth*0.7+posiCorona*heigth*0.08,
-            child: Center(
-              child: Image(image: AssetImage(image),
-                width: heigth*0.7+posiCorona*heigth*0.08,
-                height: heigth*0.7+posiCorona*heigth*0.08,),
-            ),
-          ),
-          Container(
-            width: width,
-            height: heigth*0.1,
-            child: Center(
-              child: image=="assets/recursos/diamante.png"? Text(text,style:TextStyle(fontSize: heigth*0.1)):Text(text+" \u0024",style:TextStyle(fontSize: heigth*0.1)),
-            )
-          )
-        ],
-      ),
-    );
-  }
-  Widget botonCon(icon,color,colorico,tam){
-    return Container(
-      decoration: BoxDecoration(
-          color: color,borderRadius: BorderRadius.all(Radius.circular(tam))),
-      width: tam,
-      height: tam,
-      child: MaterialButton(
-        padding: EdgeInsets.all(0),
-        child: Center(
-          child: Icon(icon,color: colorico,size: tam*0.6,),
-        ),
-      ),
-    );
-  }
+
 }

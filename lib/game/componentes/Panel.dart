@@ -1,13 +1,65 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Panel{
+  Widget recurso2(heigth,width,image,text,posiCorona){
+    return
+          Container(
+            width:width,
+            height: heigth,
+            child: Center(
+              child: Image(image: AssetImage(image),
+            ),
+          ));
+  }
+  Widget recurso(heigth,width,image,text,posiCorona){
+    return Container(
+      height: heigth,
+      width: width*0.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width:heigth*0.7+posiCorona*heigth*0.08,
+            height: image=="assets/recursos/diamante.png"?heigth*0.4+posiCorona*heigth*0.08:heigth*0.7+posiCorona*heigth*0.08,
+            child: Center(
+              child: Image(image: AssetImage(image),
+                width: heigth*0.7+posiCorona*heigth*0.08,
+                height: heigth*0.7+posiCorona*heigth*0.08,),
+            ),
+          ),
+          Container(
+              width: width,
+              height: heigth*0.1,
+              child: Center(
+                child: image=="assets/recursos/diamante.png"? Text(text,style:TextStyle(fontSize: heigth*0.1)):Text(text+" \u0024",style:TextStyle(fontSize: heigth*0.1)),
+              )
+          )
+        ],
+      ),
+    );
+  }
+  Widget botonCon(icon,color,colorico,tam){
+    return Container(
+      decoration: BoxDecoration(
+          color: color,borderRadius: BorderRadius.all(Radius.circular(tam))),
+      width: tam,
+      height: tam,
+      child: MaterialButton(
+        padding: EdgeInsets.all(0),
+        child: Center(
+          child: Icon(icon,color: colorico,size: tam*0.6,),
+        ),
+      ),
+    );
+  }
   Widget panel(width, height, List list, color3, color2, color6, color5,
       color7) {
     return Container(
       width: width > height ? height : width,
       height: width > height ? height : width,
       decoration: BoxDecoration(
-          color: color3,
+          color: color6.withOpacity(0.8),
           borderRadius: BorderRadius.circular(
               width > height ? height * 0.04 : width * 0.04)
       ),
@@ -80,8 +132,8 @@ class Panel{
             width: width / 2,
             height: width / 3,
             decoration: BoxDecoration(
-                color: color6,
-                border: Border.all(color: color2, width: 3)
+                color: color6.withOpacity(0.3),
+                border: Border(right:BorderSide(color: color7, width: 1) )
             ),
             child: Center(
               child: a != 0 ? Text(a.toString(),style: TextStyle(color: color2,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5),) : Text(""),
@@ -91,14 +143,10 @@ class Panel{
           width: width / 2,
           height: width / 3,
           decoration: BoxDecoration(
-              color: color6,
-
-              border: Border(bottom: BorderSide(color: color2, width: 3),
-                  top: BorderSide(color: color2, width: 3),
-                  right: BorderSide(color: color2, width: 3))
+          color: color6.withOpacity(0.3)
           ),
           child: Center(
-            child: b != 0 ? Text(b.toString(),style: TextStyle(color: color2,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
+            child: b != 0 ? Text(b.toString(),style: TextStyle(color: color7,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
         )
       ],
     );
@@ -112,11 +160,11 @@ class Panel{
             width: width / 3,
             height: width / 3,
             decoration: BoxDecoration(
-                border: Border(right: BorderSide(color: color6, width: 3),
-                    bottom: BorderSide(color: color6, width: d == 3 ? 0 : 3))
+                border: Border(right: BorderSide(color: color7, width: 1),
+                    bottom: BorderSide(color: color7, width: d == 3 ? 0 : 1))
             ),
             child: Center(
-              child: a != 0 ? Text(a.toString(),style: TextStyle(color: color6,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),
+              child: a != 0 ? Text(a.toString(),style: TextStyle(color: color2,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),
             )
         ),
         Container(
@@ -124,21 +172,21 @@ class Panel{
           height: width / 3,
           decoration: BoxDecoration(
               color: color5.withOpacity(0.7),
-              border: Border(right: BorderSide(color: color6, width: 3),
-                  bottom: BorderSide(color: color6, width: d == 3 ? 0 : 3))
+              border: Border(right: BorderSide(color: color7, width: 1),
+                  bottom: BorderSide(color: color7, width: d == 3 ? 0 : 1))
           ),
           child: Center(
-            child: b != 0 ? Text(b.toString(),style: TextStyle(color: color7,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
+            child: b != 0 ? Text(b.toString(),style: TextStyle(color: color2,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
         ),
         Container(
           width: width / 3,
           height: width / 3,
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: color6, width: d == 3 ? 0 : 3))
+                  bottom: BorderSide(color: color7, width: d == 3 ? 0 : 1))
           ),
           child: Center(
-            child: c != 0 ? Text(c.toString(),style: TextStyle(color: color6,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
+            child: c != 0 ? Text(c.toString(),style: TextStyle(color: color2,fontFamily: 'CenturyGothic',fontSize: (width/3)*0.5)) : Text(""),),
         )
       ],
     );

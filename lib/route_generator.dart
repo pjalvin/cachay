@@ -1,4 +1,5 @@
 import 'package:cachay/User/Profile.dart';
+import 'package:cachay/game/espera.dart';
 import 'package:cachay/game/mainGame.dart';
 import 'package:cachay/main.dart';
 import 'package:cachay/menu.dart';
@@ -24,12 +25,20 @@ class RouteGenerator {
         }
         return _errorRoute();
       case '/mainGame':
-        if(args is Size){
+        if(args is List){
           return MaterialPageRoute(
             builder: (context) => MainGame(
-              args
+              args[0],args[1],args[2],args[3]
             ),);
           }
+        break;
+      case '/espera':
+        if(args is Size){
+          return MaterialPageRoute(
+            builder: (context) => Espera(
+                args
+            ),);
+        }
         break;
 
       default:

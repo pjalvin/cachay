@@ -104,7 +104,7 @@ class _CuentaState extends State<Cuenta> {
                           color:color3,
                           child: MaterialButton(
                             height: heigthpage*0.07,
-                            child: Text('Cerrar Sesión',style: TextStyle(color: color6,fontFamily: 'CenturyGothic',fontSize: size.width*0.05),),
+                            child: Text('Cerrar Sesión',style: TextStyle(color: color6,fontFamily: 'CenturyGothic',fontSize: size.width*0.04),),
                             onPressed: (){
                               AuthUser().cerrarSesion(context);
                             },

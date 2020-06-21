@@ -2,12 +2,15 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cachay/game/ayuda_juego/Ayuda.dart';
+import 'package:cachay/User/Profile.dart';
+import 'package:cachay/game/componentes/Ayuda.dart';
 import 'package:cachay/game/componentes/Dados.dart';
 import 'package:cachay/game/componentes/Panel.dart';
 import 'package:cachay/game/funciones_cloud/Funcion.dart';
 import 'package:cachay/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/spritesheet.dart';
 import 'package:flame/widgets/animation_widget.dart';
@@ -15,25 +18,34 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/animation.dart' as animation;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 class MainGame extends StatefulWidget {
   @override
-  _MainGameState createState() => _MainGameState(size);
+  _MainGameState createState() => _MainGameState(size,idSala,tipo,id);
   Size size;
-  MainGame(this.size);
+  String idSala;
+  int tipo;
+  String id;
+  MainGame(this.size,this.idSala,this.tipo,this.id);
 }
 
 class _MainGameState extends State<MainGame> {
-  _MainGameState(this.size);
+  _MainGameState(this.size,this.idSala,this.tipo,this.id);
+  String id;
+  String idSala;
+  int tipo;
   //recursos
+  bool ayuda=false;
   Size size;
   animation.Animation _animation;
   animation.Animation _animationVolteo;
-  var colorRiva = [color5,Colors.teal, Colors.redAccent, Colors.lightBlueAccent];
-  int paso = 1;
+  var colorRiva = [color5,Colors.green, Color(0xffFA7659), Colors.lightBlueAccent];
+  int paso = 0;
   List<List<double>> PosTableros;
   List<List<double>> TamTableros;
   Offset pos1,pos2,pos3,pos4;
   Offset tam1,tam2;
+  int turno=0;
   ///////////////////////////
 
 
@@ -56,13 +68,11 @@ class _MainGameState extends State<MainGame> {
   int cantDado=0;
   List grupos=[];
   String ValorDrop;
-  List<int>valor=[25,35,45,50];
   /////////////////////
 
 
 
   //dados
-
   List dados = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
   List dadosRetenidos = [];
   List dadosAnotar=[];
@@ -76,32 +86,39 @@ class _MainGameState extends State<MainGame> {
     "assets/images/dado1/cara_5.png",
     "assets/images/dado1/cara_6.png"
   ];
-
   /////////////////////////
 
 
   //informacion de la partida
 
   List<List<int>> puntuaciones = [
-    [0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ];
   List<String> nombRiva = ["Alvin", "Juan", "Pedro", "Luis"];
-  List<Widget> ayudas = [
-    Ayudas().Ayuda1(),
-    Ayudas().Ayuda2(),
-    Ayudas().Ayuda3(),
-    Ayudas().Ayuda4()
-  ];
+  List<Widget> ayudas ;
 
   /////////////////////////////////////////
 
 
   ////funciones del juego
   iniciarJugada() {
-
+    setState(() {
+      paso = 1;
+     bloqLanzador = false;
+      apretarCacho = false;
+      bloqueoVolteos=0;
+      contadorTiros=0;
+      contadorVolteos=0;
+       dados = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+       dadosRetenidos = [];
+      dadosAnotar=[];
+       cantDado=0;
+       grupos=[];
+       ValorDrop=null;
+    });
   }
 
 
@@ -138,6 +155,12 @@ class _MainGameState extends State<MainGame> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    ayudas= [Container(),
+    Ayudas().Ayuda1(size.width,size.height),
+    Ayudas().Ayuda2(size.width,size.height),
+    Ayudas().Ayuda3(size.width,size.height),
+    Ayudas().Ayuda4(size.width,size.height)
+    ];
     cargarRecursos();
     tam2=Offset(size.width/3, size.height * 0.57 / 3);
     tam1=Offset(size.width * 0.61,size.height * 0.57);
@@ -145,8 +168,12 @@ class _MainGameState extends State<MainGame> {
     pos2=Offset(0, size.height * 0.57*0.4 / 3);
     pos3=Offset(size.width/3,0);
     pos4=Offset(size.width/3*2,size.height * 0.57*0.4 / 3);
+    if(tipo==2){
+      TamTableros=[[tam1.dx,tam1.dy],[tam2.dx,tam2.dy]];
+      PosTableros=[[pos1.dx,pos1.dy],[pos3.dx,pos3.dy]];}
+    else{
     TamTableros=[[tam1.dx,tam1.dy],[tam2.dx,tam2.dy],[tam2.dx,tam2.dy],[tam2.dx,tam2.dy]];
-    PosTableros=[[pos1.dx,pos1.dy],[pos2.dx,pos2.dy],[pos3.dx,pos3.dy],[pos4.dx,pos4.dy]];
+    PosTableros=[[pos1.dx,pos1.dy],[pos2.dx,pos2.dy],[pos3.dx,pos3.dy],[pos4.dx,pos4.dy]];}
   }
 
   void didChangeDependencies() {
@@ -160,7 +187,7 @@ class _MainGameState extends State<MainGame> {
     precacheImage(AssetImage("assets/images/dado1/cara_6.png"), context);
     precacheImage(AssetImage("assets/images/cacho.png"), context);
   }
-  Panel2(size,i,width,height){
+  Panel2(size,i,puntua,width,height,nombre){
     return Container(
         width: width,
         height: height,
@@ -172,8 +199,10 @@ class _MainGameState extends State<MainGame> {
                 height: (height) * 0.15,
                 child: Center(
                   child: Text(
-                      nombRiva[i],
+
+                      nombre,
                       style: TextStyle(
+                        color: color6,
                           fontSize: (height) *
                               0.1,
                           fontFamily: 'CenturyGothic')),)
@@ -182,7 +211,7 @@ class _MainGameState extends State<MainGame> {
                 width * 0.8,
                 (height) *
                     0.8,
-                puntuaciones[i],
+                puntua,
                 color3,
                 color2,
                 color6,
@@ -207,6 +236,7 @@ class _MainGameState extends State<MainGame> {
                 child: Center(
                   child: Text(nombRiva[i],
                     style: TextStyle(
+                      color: color6,
                         fontSize: (size.height *
                             0.57) * 0.1,
                         fontFamily: 'CenturyGothic'),),)
@@ -267,6 +297,8 @@ class _MainGameState extends State<MainGame> {
       paso=1;
     });
   }
+  int cont=0;
+  int cont2=1;
   @override
   Widget build(BuildContext context) {
     setState(() {
@@ -275,34 +307,72 @@ class _MainGameState extends State<MainGame> {
           .size;
     });
 
-    return cargando == false ?
-    GestureDetector(
-      child: Scaffold(
-        body: Column(
-          children: <Widget>[
-            Container(
-                height: size.height * 0.65,
-                child: Stack(
-                  children: <Widget>[Column(
-                    children: <Widget>[
-                      Container(
-                        height: size.height * 0.04,
-                        width: size.width,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [Colors.green.withOpacity(0.8), color6],
-                                stops: [0.01, 0.5],
-                                begin: FractionalOffset.topCenter,
-                                end: FractionalOffset.bottomCenter
-                            )
-                        ),
+    return
+    Scaffold(
+      body: StreamBuilder(
+        stream: Firestore.instance.collection("Salas").document(idSala).snapshots(),
+        builder: (context,AsyncSnapshot<DocumentSnapshot> snapshot){
+          if(!snapshot.hasData){return Container();}
+          else{
+            if(snapshot.data.data['turno']!=turno){
+              myCallback((){setState(() {
+                moverTablas(500);
+                turno=snapshot.data.data['turno'];
+              });});
+            }
+            if(snapshot.data.data['ganador']==""&&id==snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso==0){
+              print(id);
+              myCallback((){
+                setState(() {
+                  cargando=false;
+                  paso=1;
+                });
+              });
+            }
+            else{
+              if(id!=snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso!=0){
+                myCallback((){
+                  setState(() {
+                    paso=0;
+                  });
+                });
 
-                      ),
-                      Container(
-                          height: size.height * 0.61,
-                          color: color6,
-                          width: size.width,
-                          child: Stack(
+              }
+            }
+            return
+              Stack(
+                  children:[snapshot.data.data["encendido"]?GestureDetector(
+                    child: Scaffold(
+                      body: Column(
+                        children: <Widget>[
+                          Container(
+                              height: size.height * 0.65,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    "assets/recursos/mesa3.jpg"
+                                  ),fit: BoxFit.cover
+                                )
+                              ),
+                              child: Stack(
+                                children: <Widget>[
+                                  Container(
+                                    color:Colors.black.withOpacity(0.3),
+                                  ),
+                                  Column(
+                                  children: <Widget>[
+                                    Container(
+                                      height: size.height * 0.04,
+                                      width: size.width,
+                                      decoration: BoxDecoration(
+                                          color:Colors.transparent
+                                      ),
+
+                                    ),
+                                    Container(
+                                        height: size.height * 0.61,
+                                        width: size.width,
+                                        child: /*Stack(
                             children:PosTableros.asMap().entries.map((entrie){
                               return Positioned(
                                 top: entrie.value[1],
@@ -310,86 +380,189 @@ class _MainGameState extends State<MainGame> {
                                 child: Panel2(size,entrie.key,TamTableros[entrie.key][0],TamTableros[entrie.key][1])
                               );
                             }).toList()
+                          )*/
+                                        StreamBuilder(
+                                          stream: Firestore.instance.collection("Salas").document(idSala).collection("jugadores").orderBy("time").snapshots(),
+                                          builder: (BuildContext context,snapshot){
+                                            if(snapshot.hasData){
+                                              List<DocumentSnapshot> items = snapshot.data.documents;
+                                              print(items[0].documentID);
+                                              return Stack(
+                                                  children:PosTableros.asMap().entries.map((entrie){
+                                                    return Positioned(
+                                                        top: entrie.value[1],
+                                                        left: entrie.value[0],
+                                                        child: Panel2(size,entrie.key,items[entrie.key].data['puntuacion'],TamTableros[entrie.key][0],TamTableros[entrie.key][1],items[entrie.key].data['nombre'],)
+                                                    );
+                                                  }).toList());
+                                            }
+                                            else{
+                                              return Center(
+                                                child: Text('Cargando'),
+                                              );
+                                            }
+                                          },
+                                        )
+
+                                    )
+                                  ],
+                                ),
+                                  ayuda?Container(
+                                    height: size.height * 0.65,
+                                    width: size.width,
+                                    child: ayudas[paso],
+                                  ):Container(),
+                                  Positioned(
+                                    bottom: size.width*0.05,
+                                    right: size.width*0.05,
+                                    child: Container(
+                                      width: size.width*0.1,
+                                      height: size.width*0.1,
+                                      child: IconButton(
+                                        iconSize: size.width*0.1,
+                                        icon:Icon(Icons.help),
+                                        color: color6,
+                                        onPressed: (){
+                                            setState(() {
+                                              ayuda=!ayuda;
+                                            });
+                                          },
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
+                          ),
+                          Container(
+                            width: size.width,
+                            height: size.height * 0.35,
+                            child: Stack(
+                                children:[Container(
+                                    width: size.width,
+                                    height: size.height * 0.35,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: color2, width: 3),
+                                        color: color7.withOpacity(0.5),
+                                        image: DecorationImage(
+                                            colorFilter: ColorFilter.mode(
+                                                Color(0xff108BF1), BlendMode.colorBurn),
+                                            image: AssetImage("assets/images/tablero_1.jpg"),
+                                            fit: BoxFit.cover
+                                        )),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                            height: size.height * 0.29 - 6,
+                                            child: Row(
+                                              children: <Widget>[
+                                                Container(
+                                                  width: size.width * 0.7 - 6,
+                                                  child:
+                                                  Center(
+                                                    child: tableLanza(size.width * 0.6,
+                                                        (size.height * 0.29 - 6) * 0.7),
+                                                  ),
+                                                ),
+                                                Container(
+                                                    width: size.width * 0.3,
+                                                    child: Center(
+                                                      child: lanzador(size.width * 0.3,
+                                                          (size.height * 0.29 - 6) * 0.5),
+                                                    )
+                                                )
+                                              ],
+                                            )
+                                        ),
+                                        paso==1||paso==2||paso==0
+                                            ?Container(
+                                          padding: EdgeInsets.all(size.height * 0.01),
+                                          height: size.height * 0.06,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: color7),
+                                            borderRadius: BorderRadius.circular(
+                                                size.height * 0.06 * 0.2)
+                                            ,
+                                            image: DecorationImage(
+                                                colorFilter: ColorFilter.mode(
+                                                    color3, BlendMode.color),
+                                                image: AssetImage("assets/images/tablero_1.jpg"),
+                                                fit: BoxFit.cover
+                                            ),
+                                          ),
+                                          child: anotado(
+                                              size.height * 0.04 * 5 + size.height * 0.01 * 4,
+                                              size.height * 0.04),
+                                        )
+                                            :paso==3||paso==5
+                                            ?botonAbajo(size.height * 0.04 * 5 + size.height * 0.01 * 4, size.height * 0.06, "Siguiente", color5)
+                                            :abajopaso4(size.width*0.8, size.height * 0.06, Colors.blueGrey)
+                                      ],
+                                    )
+                                ),
+                                  cargando||snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?Container(
+                                    width: size.width,
+                                    height: size.height * 0.35,
+                                    color: color7.withOpacity(0.6),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Container(
+                                          width: size.width,
+                                          height: size.height*0.1,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children:[
+                                              snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?
+                                              Container(
+                                                color: color7.withOpacity(0.3),
+                                                width: size.width,
+                                                height: size.height*0.06,
+                                                child: Center(
+                                                  child: Text('Esperando...',style: TextStyle(color: color6.withOpacity(0.6),fontSize: size.height*0.03),),
+
+                                                )  ):Container(),
+                                          ])
+                                        ),
+                                        Container(
+                                          width: size.width,
+                                          height: size.height*0.25,
+                                          child: Center(
+                                            child:carga(size.width*0.3, size.height*0.15)
+                                          ),
+
+                                        )
+
+                                      ],
+                                    )
+                                  ):Container()
+                                ]),
                           )
-
-                      )
-                    ],
-                  ),
-
-                  ],
-                )
-            ),
-            Container(
-                width: size.width,
-                height: size.height * 0.35,
-                decoration: BoxDecoration(
-                    border: Border.all(color: color2, width: 3),
-                    color: color7.withOpacity(0.5),
-                    image: DecorationImage(
-                        colorFilter: ColorFilter.mode(
-                            Color(0xff108BF1), BlendMode.colorBurn),
-                        image: AssetImage("assets/images/tablero_1.jpg"),
-                        fit: BoxFit.cover
-                    )),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                        height: size.height * 0.29 - 6,
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              width: size.width * 0.7 - 6,
-                              child:
-                              Center(
-                                child: tableLanza(size.width * 0.6,
-                                    (size.height * 0.29 - 6) * 0.7),
-                              ),
-                            ),
-                            Container(
-                                width: size.width * 0.3,
-                                child: Center(
-                                  child: lanzador(size.width * 0.3,
-                                      (size.height * 0.29 - 6) * 0.5),
-                                )
-                            )
-                          ],
-                        )
-                    ),
-                    paso==1||paso==2||paso==0
-                    ?Container(
-                      padding: EdgeInsets.all(size.height * 0.01),
-                      height: size.height * 0.06,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: color7),
-                        borderRadius: BorderRadius.circular(
-                            size.height * 0.06 * 0.2)
-                        ,
-                        image: DecorationImage(
-                            colorFilter: ColorFilter.mode(
-                                color3, BlendMode.color),
-                            image: AssetImage("assets/images/tablero_1.jpg"),
-                            fit: BoxFit.cover
-                        ),
+                        ],
                       ),
-                      child: anotado(
-                          size.height * 0.04 * 5 + size.height * 0.01 * 4,
-                          size.height * 0.04),
-                    )
-                    :paso==3||paso==5
-                    ?botonAbajo(size.height * 0.04 * 5 + size.height * 0.01 * 4, size.height * 0.06, "Siguiente", color5)
-                        :abajopaso4(size.width*0.8, size.height * 0.06, Colors.blueGrey)
-                  ],
-                )
-            )
-          ],
-        ),
-      ),
-    )
-        : Container(child: Center(child: Text('Cargando'),),);
+                    ),
+                  ):Container(child:Text('Buscando partida'),),
+                    snapshot.data.data["ganador"]==""
+                        ?Container()
+                        :terminado(size.width, size.height, snapshot.data.data["ganador"],snapshot.data.data["arrayP"][snapshot.data.data["turno"]])
+                  ]);
+          }
+        },
+      )
+    );
   }
 
 
+ Widget carga(width,height){
+ return Container(
+   width: width,
+   height: height,
+   child: SpinKitPouringHourglass(
+     color: color6.withOpacity(0.5),
 
+     size: width*0.6,
+   ),
+ );
+ }
 
   Widget lanzador(width, height) {
     return Container(
@@ -642,9 +815,7 @@ class _MainGameState extends State<MainGame> {
             case 3:
               break;
             case 4:
-              setState(() {
-                paso++;
-              });
+              anotarLanzado(ValorDrop);
               break;
           }
         },
@@ -699,15 +870,24 @@ class _MainGameState extends State<MainGame> {
       dev[0]=int.parse(div[0]);
     }
     for(int i=0;i<jugadas.length;i++){
-      if(jugadas[i]==tipo){
+      if(jugadas[i]==busq){
         dev[1]=i;
         break;
       }
     }
     return dev;
   }
-  anotarLanzado(lanz){
+  anotarLanzado(lanz)async{
+    setState(() {
+      cargando=true;
+    });
     var verlan=sacarTipo(lanz);
+    await FuncionesJuegos().subirPuntaje(verlan,contadorTiros,idSala);
+    iniciarJugada();
+    setState(() {
+      paso=0;
+    });
+
   }
   //funciones del juego
   lanzarDados2() async {
@@ -824,6 +1004,98 @@ class _MainGameState extends State<MainGame> {
       }
 
   }
+  Widget terminado(width,height,ganador,turno){
+    return Container(
+      width: width,
+      height: height,
+      color: color7.withOpacity(0.9),
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: height*0.25,
+            child: Center(
+              child: Text(turno==id?"Ganador":"Perdedor",style: TextStyle(color: color6,fontSize: size.width*0.18,fontFamily: 'CenturyGothic',fontWeight: FontWeight.bold),),
+
+            )
+          ),
+
+          Container(
+            height: height*0.1,
+            color: turno==id?Color(0xff0A3226).withOpacity(0.8):color1.withOpacity(0.5),
+            child: Center(
+              child: Text(turno==id?ganador:"Ganó "+ganador,style: TextStyle(color: color6,fontSize: size.width*0.09,fontFamily: 'CenturyGothic',fontWeight: FontWeight.bold),)
+            ),
+          ),
+          Container(
+              height: height*0.25,
+              padding: EdgeInsets.all(height*0.02),
+              child: Center(
+                child: Image.asset("assets/logo.png"),
+              )
+          ),
+          Container(
+            height: height*0.4,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  height: height*0.2,
+                  decoration: BoxDecoration(
+                      color: color7.withOpacity(0.3),
+                    border: Border(top:BorderSide(color: color5,width: 0.4),bottom: BorderSide(color: color5,width: 0.4))
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        height: height*0.2,
+                        width: width*0.6,
+                        child: Center(
+                          child: Text(turno==id?"Recibiste\n"+"200"+" XP":"Recibiste\n"+"20"+" XP",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: color5,
+                              fontSize: size.width*0.08,
+                              fontFamily: 'CenturyGothic',),),
+
+                        ),
+                      ),
+                      Panel().recurso2(height*0.15, width*0.3, "assets/recursos/monedas2.png", "", 0.5),
+                    ],
+                  ),
+                ),
+                Divider(
+                  height: height*0.025,
+                  color: Colors.transparent,
+                ),
+                Container(
+                  height: height*0.04,
+                  width: width*0.4,
+                  child: MaterialButton(
+                    elevation: 0,
+                    color: color1.withOpacity(0.5),
+                    onPressed: ()async{
+                      FirebaseUser user=await FirebaseAuth.instance.currentUser();
+                      var snap=await Firestore.instance.collection("Usuarios").document(id).get();
+                      Profile prof=new Profile(user.email, snap.data["Nombre"], snap.data["oro"],
+                          snap.data["diamantes"],snap.data["cambioN"] , snap.data["xp"]);
+                        Navigator.pushNamedAndRemoveUntil(context,"/menu", ModalRoute.withName("/menu"),arguments: prof);
+                    },
+                    child: Center(
+                      child: Text('Aceptar',
+                        style:
+                        TextStyle(
+                          color: color6,
+                          fontSize: height*0.025,
+                          fontFamily: 'CenturyGothic',),),
+                    )
+                  ),
+                )
+              ],
+            )
+          )
+        ],
+      )
+    );
+  }
   AgruparDadosAnotar(i){
       if(paso==4){
         if(!dadosAnotar.asMap().containsValue(i)){
@@ -857,7 +1129,7 @@ class _MainGameState extends State<MainGame> {
       dados.forEach((val) {
         val[1] = 0;
         setState(() {
-          val[0] = 1+Random().nextInt(5);
+          val[0] = 1+Random().nextInt(6);
           print(val[0]);
           bloqLanzador = false;
         });
@@ -931,6 +1203,10 @@ class _MainGameState extends State<MainGame> {
         });
         await esperarVolteo(i);
     }
+  } void myCallback(Function callback) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      callback();
+    });
   }
 
 
