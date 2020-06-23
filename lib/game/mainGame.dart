@@ -3,10 +3,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cachay/User/Profile.dart';
+import 'package:cachay/game/bloc/bloc.dart';
 import 'package:cachay/game/componentes/Ayuda.dart';
+import 'package:cachay/game/componentes/Carga.dart';
 import 'package:cachay/game/componentes/Dados.dart';
 import 'package:cachay/game/componentes/Panel.dart';
+import 'package:cachay/game/componentes/lanzador.dart';
 import 'package:cachay/game/funciones_cloud/Funcion.dart';
+import 'package:cachay/game/repository/game_repository.dart';
 import 'package:cachay/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -18,6 +22,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/animation.dart' as animation;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 class MainGame extends StatefulWidget {
   @override
@@ -65,7 +70,7 @@ class _MainGameState extends State<MainGame> {
   List<String> jugadas=["Balas","Tontos","Trenes",
                         "Cuadras","Quinas","Senas",
                         "Escalera","Full","Poker","Grande"];
-  int cantDado=0;
+
   List grupos=[];
   String ValorDrop;
   /////////////////////
@@ -115,7 +120,6 @@ class _MainGameState extends State<MainGame> {
        dados = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
        dadosRetenidos = [];
       dadosAnotar=[];
-       cantDado=0;
        grupos=[];
        ValorDrop=null;
     });
@@ -308,71 +312,79 @@ class _MainGameState extends State<MainGame> {
     });
 
     return
-    Scaffold(
-      body: StreamBuilder(
-        stream: Firestore.instance.collection("Salas").document(idSala).snapshots(),
-        builder: (context,AsyncSnapshot<DocumentSnapshot> snapshot){
-          if(!snapshot.hasData){return Container();}
-          else{
-            if(snapshot.data.data['turno']!=turno){
-              myCallback((){setState(() {
-                moverTablas(500);
-                turno=snapshot.data.data['turno'];
-              });});
-            }
-            if(snapshot.data.data['ganador']==""&&id==snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso==0){
-              print(id);
-              myCallback((){
-                setState(() {
-                  cargando=false;
-                  paso=1;
-                });
-              });
-            }
-            else{
-              if(id!=snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso!=0){
-                myCallback((){
-                  setState(() {
-                    paso=0;
+    BlocProvider(
+      create: (context)=>GameBloc(GameRepo()),
+      child: Scaffold(
+          body: StreamBuilder(
+            stream: Firestore.instance.collection("Salas").document(idSala).snapshots(),
+            builder: (context,AsyncSnapshot<DocumentSnapshot> snapshot){
+              if(!snapshot.hasData){return Container();}
+              else{
+                if(snapshot.data.data['turno']!=turno){
+                  myCallback((){setState(() {
+                    moverTablas(500);
+                    turno=snapshot.data.data['turno'];
+                  });});
+                }
+                if(snapshot.data.data['ganador']==""&&id==snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso==0){
+                  print(id);
+                  myCallback((){
+                    setState(() {
+                      cargando=false;
+                      paso=1;
+                    });
                   });
-                });
+                }
+                else{
+                  if(id!=snapshot.data.data['arrayP'][snapshot.data.data['turno']]&&paso!=0){
+                    myCallback((){
+                      setState(() {
+                        paso=0;
+                      });
+                    });
 
-              }
-            }
-            return
-              Stack(
-                  children:[snapshot.data.data["encendido"]?GestureDetector(
-                    child: Scaffold(
-                      body: Column(
-                        children: <Widget>[
-                          Container(
-                              height: size.height * 0.65,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    "assets/recursos/mesa3.jpg"
-                                  ),fit: BoxFit.cover
-                                )
-                              ),
-                              child: Stack(
-                                children: <Widget>[
-                                  Container(
-                                    color:Colors.black.withOpacity(0.3),
-                                  ),
-                                  Column(
+                  }
+                }
+                return
+                  BlocBuilder<GameBloc,GameState>(
+                    builder: (context,state){
+                      if(state is GameInit){
+                        BlocProvider.of<GameBloc>(context).add(IniciarJugada(size,tipo));
+                      }
+                      if(state is GameLoaded){
+                        return Stack(
+                            children:[snapshot.data.data["encendido"]?GestureDetector(
+                              child: Scaffold(
+                                body: Column(
                                   children: <Widget>[
                                     Container(
-                                      height: size.height * 0.04,
-                                      width: size.width,
-                                      decoration: BoxDecoration(
-                                          color:Colors.transparent
-                                      ),
+                                        height: size.height * 0.65,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    "assets/recursos/mesa3.jpg"
+                                                ),fit: BoxFit.cover
+                                            )
+                                        ),
+                                        child: Stack(
+                                          children: <Widget>[
+                                            Container(
+                                              color:Colors.black.withOpacity(0.3),
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  height: size.height * 0.04,
+                                                  width: size.width,
+                                                  decoration: BoxDecoration(
+                                                      color:Colors.transparent
+                                                  ),
 
-                                    ),
-                                    Container(
-                                        height: size.height * 0.61,
-                                        width: size.width,
-                                        child: /*Stack(
+                                                ),
+                                                Container(
+                                                    height: size.height * 0.61,
+                                                    width: size.width,
+                                                    child: /*Stack(
                             children:PosTableros.asMap().entries.map((entrie){
                               return Positioned(
                                 top: entrie.value[1],
@@ -381,188 +393,186 @@ class _MainGameState extends State<MainGame> {
                               );
                             }).toList()
                           )*/
-                                        StreamBuilder(
-                                          stream: Firestore.instance.collection("Salas").document(idSala).collection("jugadores").orderBy("time").snapshots(),
-                                          builder: (BuildContext context,snapshot){
-                                            if(snapshot.hasData){
-                                              List<DocumentSnapshot> items = snapshot.data.documents;
-                                              print(items[0].documentID);
-                                              return Stack(
-                                                  children:PosTableros.asMap().entries.map((entrie){
-                                                    return Positioned(
-                                                        top: entrie.value[1],
-                                                        left: entrie.value[0],
-                                                        child: Panel2(size,entrie.key,items[entrie.key].data['puntuacion'],TamTableros[entrie.key][0],TamTableros[entrie.key][1],items[entrie.key].data['nombre'],)
-                                                    );
-                                                  }).toList());
-                                            }
-                                            else{
-                                              return Center(
-                                                child: Text('Cargando'),
-                                              );
-                                            }
-                                          },
-                                        )
+                                                    StreamBuilder(
+                                                      stream: Firestore.instance.collection("Salas").document(idSala).collection("jugadores").orderBy("time").snapshots(),
+                                                      builder: (BuildContext context,snapshot){
+                                                        if(snapshot.hasData){
+                                                          List<DocumentSnapshot> items = snapshot.data.documents;
+                                                          print(items[0].documentID);
+                                                          return Stack(
+                                                              children:PosTableros.asMap().entries.map((entrie){
+                                                                return Positioned(
+                                                                    top: entrie.value[1],
+                                                                    left: entrie.value[0],
+                                                                    child: Panel2(size,entrie.key,items[entrie.key].data['puntuacion'],TamTableros[entrie.key][0],TamTableros[entrie.key][1],items[entrie.key].data['nombre'],)
+                                                                );
+                                                              }).toList());
+                                                        }
+                                                        else{
+                                                          return Center(
+                                                            child: Text('Cargando'),
+                                                          );
+                                                        }
+                                                      },
+                                                    )
 
+                                                )
+                                              ],
+                                            ),
+                                            state.game.ayuda?Container(
+                                              height: size.height * 0.65,
+                                              width: size.width,
+                                              child: ayudas[paso],
+                                            ):Container(),
+                                            Positioned(
+                                              bottom: size.width*0.05,
+                                              right: size.width*0.05,
+                                              child: Container(
+                                                width: size.width*0.1,
+                                                height: size.width*0.1,
+                                                child: IconButton(
+                                                  iconSize: size.width*0.1,
+                                                  icon:Icon(Icons.help),
+                                                  color: color6,
+                                                  onPressed: (){
+                                                    setState(() {
+                                                      BlocProvider.of<GameBloc>(context).add(Ayuda());
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                    ),
+                                    Container(
+                                      width: size.width,
+                                      height: size.height * 0.35,
+                                      child: Stack(
+                                          children:[Container(
+                                              width: size.width,
+                                              height: size.height * 0.35,
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(color: color2, width: 3),
+                                                  color: color7.withOpacity(0.5),
+                                                  image: DecorationImage(
+                                                      colorFilter: ColorFilter.mode(
+                                                          Color(0xff108BF1), BlendMode.colorBurn),
+                                                      image: AssetImage("assets/images/tablero_1.jpg"),
+                                                      fit: BoxFit.cover
+                                                  )),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Container(
+                                                      height: size.height * 0.29 - 6,
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          Container(
+                                                            width: size.width * 0.7 - 6,
+                                                            child:
+                                                            Center(
+                                                              child: tableLanza(size.width * 0.6,
+                                                                  (size.height * 0.29 - 6) * 0.7),
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                              width: size.width * 0.3,
+                                                              child: Center(
+                                                                child: Lanzador(size.width * 0.3,
+                                                                    (size.height * 0.29 - 6) * 0.5),
+                                                              )
+                                                          )
+                                                        ],
+                                                      )
+                                                  ),
+                                                  paso==1||paso==2||paso==0
+                                                      ?Container(
+                                                    padding: EdgeInsets.all(size.height * 0.01),
+                                                    height: size.height * 0.06,
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(color: color7),
+                                                      borderRadius: BorderRadius.circular(
+                                                          size.height * 0.06 * 0.2)
+                                                      ,
+                                                      image: DecorationImage(
+                                                          colorFilter: ColorFilter.mode(
+                                                              color3, BlendMode.color),
+                                                          image: AssetImage("assets/images/tablero_1.jpg"),
+                                                          fit: BoxFit.cover
+                                                      ),
+                                                    ),
+                                                    child: anotado(
+                                                        size.height * 0.04 * 5 + size.height * 0.01 * 4,
+                                                        size.height * 0.04),
+                                                  )
+                                                      :paso==3||paso==5
+                                                      ?botonAbajo(size.height * 0.04 * 5 + size.height * 0.01 * 4, size.height * 0.06, "Siguiente", color5)
+                                                      :abajopaso4(size.width*0.8, size.height * 0.06, Colors.blueGrey)
+                                                ],
+                                              )
+                                          ),
+                                            cargando||snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?Container(
+                                                width: size.width,
+                                                height: size.height * 0.35,
+                                                color: color7.withOpacity(0.6),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: <Widget>[
+                                                    Container(
+                                                        width: size.width,
+                                                        height: size.height*0.1,
+                                                        child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                            children:[
+                                                              snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?
+                                                              Container(
+                                                                  color: color7.withOpacity(0.3),
+                                                                  width: size.width,
+                                                                  height: size.height*0.06,
+                                                                  child: Center(
+                                                                    child: Text('Esperando...',style: TextStyle(color: color6.withOpacity(0.6),fontSize: size.height*0.03),),
+
+                                                                  )  ):Container(),
+                                                            ])
+                                                    ),
+                                                    Container(
+                                                      width: size.width,
+                                                      height: size.height*0.25,
+                                                      child: Center(
+                                                          child:Carga(width: size.width*0.3, height: size.height*0.15)
+                                                        //carga(size.width*0.3, size.height*0.15)
+                                                      ),
+
+                                                    )
+
+                                                  ],
+                                                )
+                                            ):Container()
+                                          ]),
                                     )
                                   ],
                                 ),
-                                  ayuda?Container(
-                                    height: size.height * 0.65,
-                                    width: size.width,
-                                    child: ayudas[paso],
-                                  ):Container(),
-                                  Positioned(
-                                    bottom: size.width*0.05,
-                                    right: size.width*0.05,
-                                    child: Container(
-                                      width: size.width*0.1,
-                                      height: size.width*0.1,
-                                      child: IconButton(
-                                        iconSize: size.width*0.1,
-                                        icon:Icon(Icons.help),
-                                        color: color6,
-                                        onPressed: (){
-                                            setState(() {
-                                              ayuda=!ayuda;
-                                            });
-                                          },
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
-                          ),
-                          Container(
-                            width: size.width,
-                            height: size.height * 0.35,
-                            child: Stack(
-                                children:[Container(
-                                    width: size.width,
-                                    height: size.height * 0.35,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: color2, width: 3),
-                                        color: color7.withOpacity(0.5),
-                                        image: DecorationImage(
-                                            colorFilter: ColorFilter.mode(
-                                                Color(0xff108BF1), BlendMode.colorBurn),
-                                            image: AssetImage("assets/images/tablero_1.jpg"),
-                                            fit: BoxFit.cover
-                                        )),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                            height: size.height * 0.29 - 6,
-                                            child: Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  width: size.width * 0.7 - 6,
-                                                  child:
-                                                  Center(
-                                                    child: tableLanza(size.width * 0.6,
-                                                        (size.height * 0.29 - 6) * 0.7),
-                                                  ),
-                                                ),
-                                                Container(
-                                                    width: size.width * 0.3,
-                                                    child: Center(
-                                                      child: lanzador(size.width * 0.3,
-                                                          (size.height * 0.29 - 6) * 0.5),
-                                                    )
-                                                )
-                                              ],
-                                            )
-                                        ),
-                                        paso==1||paso==2||paso==0
-                                            ?Container(
-                                          padding: EdgeInsets.all(size.height * 0.01),
-                                          height: size.height * 0.06,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color: color7),
-                                            borderRadius: BorderRadius.circular(
-                                                size.height * 0.06 * 0.2)
-                                            ,
-                                            image: DecorationImage(
-                                                colorFilter: ColorFilter.mode(
-                                                    color3, BlendMode.color),
-                                                image: AssetImage("assets/images/tablero_1.jpg"),
-                                                fit: BoxFit.cover
-                                            ),
-                                          ),
-                                          child: anotado(
-                                              size.height * 0.04 * 5 + size.height * 0.01 * 4,
-                                              size.height * 0.04),
-                                        )
-                                            :paso==3||paso==5
-                                            ?botonAbajo(size.height * 0.04 * 5 + size.height * 0.01 * 4, size.height * 0.06, "Siguiente", color5)
-                                            :abajopaso4(size.width*0.8, size.height * 0.06, Colors.blueGrey)
-                                      ],
-                                    )
-                                ),
-                                  cargando||snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?Container(
-                                    width: size.width,
-                                    height: size.height * 0.35,
-                                    color: color7.withOpacity(0.6),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Container(
-                                          width: size.width,
-                                          height: size.height*0.1,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children:[
-                                              snapshot.data.data["arrayP"][snapshot.data.data["turno"]]!=id?
-                                              Container(
-                                                color: color7.withOpacity(0.3),
-                                                width: size.width,
-                                                height: size.height*0.06,
-                                                child: Center(
-                                                  child: Text('Esperando...',style: TextStyle(color: color6.withOpacity(0.6),fontSize: size.height*0.03),),
-
-                                                )  ):Container(),
-                                          ])
-                                        ),
-                                        Container(
-                                          width: size.width,
-                                          height: size.height*0.25,
-                                          child: Center(
-                                            child:carga(size.width*0.3, size.height*0.15)
-                                          ),
-
-                                        )
-
-                                      ],
-                                    )
-                                  ):Container()
-                                ]),
-                          )
-                        ],
-                      ),
-                    ),
-                  ):Container(child:Text('Buscando partida'),),
-                    snapshot.data.data["ganador"]==""
-                        ?Container()
-                        :terminado(size.width, size.height, snapshot.data.data["ganador"],snapshot.data.data["arrayP"][snapshot.data.data["turno"]])
-                  ]);
-          }
-        },
-      )
+                              ),
+                            ):Container(child:Text('Buscando partida'),),
+                              snapshot.data.data["ganador"]==""
+                                  ?Container()
+                                  :terminado(size.width, size.height, snapshot.data.data["ganador"],snapshot.data.data["arrayP"][snapshot.data.data["turno"]])
+                            ]);
+                      }
+                      else{
+                        return Container();
+                      }
+                    },
+                  );
+              }
+            },
+          )
+      ),
     );
   }
 
 
- Widget carga(width,height){
- return Container(
-   width: width,
-   height: height,
-   child: SpinKitPouringHourglass(
-     color: color6.withOpacity(0.5),
 
-     size: width*0.6,
-   ),
- );
- }
 
   Widget lanzador(width, height) {
     return Container(
