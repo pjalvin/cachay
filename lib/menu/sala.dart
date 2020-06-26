@@ -1,14 +1,12 @@
-import 'package:cachay/game/componentes/Ayuda.dart';
-import 'package:cachay/game/funciones_cloud/Funcion.dart';
+
 import 'package:cachay/main.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-class Game extends StatefulWidget {
+class Sala extends StatefulWidget {
   @override
-   GameState createState() =>  GameState();
+   SalaState createState() =>  SalaState();
 }
 
-class  GameState extends State <Game> {
+class  SalaState extends State <Sala> {
   bool cargando=false;
   @override
   void initState() {
@@ -73,36 +71,48 @@ class  GameState extends State <Game> {
                ),
              )
            ),
-           Container(
-             decoration: BoxDecoration(
-                 color: color7.withOpacity(0.5),
-                 image: DecorationImage(
-                     image:AssetImage( "assets/recursos/dados4.jpg"),
-                     fit:BoxFit.cover
-                 )),
-             child: Container(
-               color: color7.withOpacity(0.5),
-               child: Column(
-                 children: <Widget>[
-                   Container(
-                     width: size.width,
-                     height: heightpage*0.35,
-                     child: Row(
-                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+           Stack(
+             children: <Widget>[
+               Container(
+                   decoration: BoxDecoration(
+                       color: color7.withOpacity(0.5),
+                       image: DecorationImage(
+                           image:AssetImage( "assets/recursos/dados4.jpg"),
+                           fit:BoxFit.cover
+                       )),
+                   child: Container(
+                     color: color7.withOpacity(0.5),
+                     child: Column(
                        children: <Widget>[
-                         botonJuego(size.width*0.25, "assets/recursos/dados3.jpg", "+",size),
-                         botonJuego(size.width*0.25, "assets/recursos/dados4.jpg", "a",size)],
+                         Container(
+                           width: size.width,
+                           height: heightpage*0.35,
+                           child: Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceAround,
+                             children: <Widget>[
+                               botonJuego(size.width*0.25, "assets/recursos/dados3.jpg", "+",size),
+                               botonJuego(size.width*0.25, "assets/recursos/dados4.jpg", "a",size)],
+                           ),
+                         ),
+                         Container(
+                           height: heightpage*0.15,
+                           child: Center(
+                             child: Text("Sala",style: TextStyle(fontSize: size.height*0.06,color: color6,letterSpacing: 2.5,fontFamily: 'CenturyGothic',fontWeight: FontWeight.bold),),
+                           ),
+                         ),
+                       ],
                      ),
-                   ),
-                   Container(
-                     height: heightpage*0.15,
-                     child: Center(
-                       child: Text("Sala",style: TextStyle(fontSize: size.height*0.06,color: color6,letterSpacing: 2.5,fontFamily: 'CenturyGothic',fontWeight: FontWeight.bold),),
-                     ),
-                   ),
-                 ],
+                   )
                ),
-             )
+               Container(
+                 width: size.width,
+                 height: heightpage*0.5,
+                 color: color7.withOpacity(0.6),
+                 child: Center(
+                   child: Text('Proximamente',style: TextStyle(color: color6.withOpacity(0.9),fontFamily: 'CenturyGothic',fontSize: size.height*0.05),),
+                 ),
+               )
+             ],
            )
           ],
         ),
@@ -121,11 +131,11 @@ class  GameState extends State <Game> {
         onPressed: ()async {
           switch(text){
             case "1v1":
-              print("asdf1231234");
-              Navigator.pushNamed(context, "/espera",arguments: size);
+              Navigator.pushNamed(context, "/espera",arguments: [size,2],);
 
               break;
             case "1v3":
+              Navigator.pushNamed(context, "/espera",arguments: [size,4],);
               break;
             case "+":
               break;

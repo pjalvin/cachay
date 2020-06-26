@@ -1,3 +1,8 @@
+//Esta clase sirve para poder enrutar las diferentes pantallas de mi proyecto
+//Aqui recibe el nombre y los argumentos que se envian en el navigator
+//despues los redirige dependiendo del nombre
+
+import 'package:cachay/InicioApp.dart';
 import 'package:cachay/User/Profile.dart';
 import 'package:cachay/game/espera.dart';
 import 'package:cachay/game/mainGame.dart';
@@ -33,10 +38,10 @@ class RouteGenerator {
           }
         break;
       case '/espera':
-        if(args is Size){
+        if(args is List){
           return MaterialPageRoute(
             builder: (context) => Espera(
-                args
+                args[0],args[1]
             ),);
         }
         break;

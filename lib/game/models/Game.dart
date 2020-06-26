@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../main.dart';
 class Game {
 
+  var tam2,tam1;
+  var pos1,pos2,pos3,pos4;
   //recursos
   bool ayuda=false;
   int paso = 0;
@@ -21,6 +23,7 @@ class Game {
   int bloqueoVolteos=0;
   int contadorTiros=0;
   int contadorVolteos=0;
+  int estadoTempo=60;
 
   //////////////////////////////
 
@@ -30,6 +33,25 @@ class Game {
   int cantDado=0;
   List grupos=[];
   String ValorDrop;
+  List<List<dynamic>> lanzamientos1 = [
+    [0, 0, 0, 0, 0, ],
+    [0, 0, 0, 0, 0, ],
+    [0, 0, 0, 0, 0, ],
+    [0, 0, 0, 0, 0, ]
+  ];
+
+  List<List<dynamic>> lanzamientos2 = [
+    [],
+    [],
+    [],
+    []
+  ];
+  List<List<dynamic>> puntuaciones = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ];
   /////////////////////
 
 
@@ -47,6 +69,12 @@ class Game {
   Game(
       this.PosTableros,
       this.TamTableros,
-      this.ayudas
+      this.ayudas,
+      this.tam1,
+      this.tam2,
+      this.pos1,
+      this.pos2,
+      this.pos3,
+      this.pos4
       );
 }

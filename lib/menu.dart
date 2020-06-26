@@ -1,7 +1,11 @@
+//Esta es mi clase en donde pongo mis pantallas de inicio
+//aqui esta mi bottom navigation bar pero en este caso estoy utilizando
+//un TabBar en vez del otro widget
+
 import 'package:cachay/User/Profile.dart';
 import 'package:cachay/main.dart';
 import 'package:cachay/menu/cuenta.dart';
-import 'package:cachay/menu/game.dart';
+import 'package:cachay/menu/sala.dart';
 import 'package:cachay/menu/inicio.dart';
 import 'package:cachay/menu/rank.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +34,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     print(widget.profile);
      _pages= [
       Inicio(profile: widget.profile,),
-      Game(),
+      Sala(),
       Rank(),
       Cuenta(profile: widget.profile,)
     ];

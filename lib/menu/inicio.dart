@@ -1,10 +1,13 @@
+//Pantalla de inicio de la aplicacion
+//Aqui se meustra informacion sobre ut posicion
+//y con los recursos que cuentas ahora
 import 'dart:async';
-
 import 'package:cachay/User/Profile.dart';
-import 'package:cachay/game/componentes/Panel.dart';
+import 'package:cachay/game/componentes/Tablero1/Panel.dart';
 import 'package:cachay/main.dart';
 import 'package:flutter/material.dart';
 class Inicio extends StatefulWidget {
+  //Aqui se obtiene el perfil del usuario desde la pantalla anterior
   final Profile profile;
   @override
   _InicioState createState() => _InicioState();
@@ -15,46 +18,24 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
+
+  //Recursos de la aplicacion inicial
   List<String> tipo=["Principiante","Intermedio","Pro","Épico","Leyenda"];
   List<String> imgCoronas=["assets/iconos_rank/corona_1.png","assets/iconos_rank/corona_2.png","assets/iconos_rank/corona_3.png",
     "assets/iconos_rank/corona_4.png","assets/iconos_rank/corona_5.png"];
   int dirmovi=1;
   double posiCorona=-0.1;
-  Future reloj(pos)async {
-    Completer c=Completer();
-    Timer(Duration(milliseconds: dirmovi==1?40:40),(){
-      c.complete(mover(pos+dirmovi*0.01));
-    });
-  }
-  mover(pos){
-    setState(() {
-      posiCorona=pos;
-    });
-    if(pos<=-0.1){
-      setState(() {
+  bool bloqueo=false;
+/////////////////////////////////////////////
 
-        dirmovi=1;
-      });
-    }else{
-      if(pos>=0.1){
-        setState(() {
-
-          dirmovi=-1;
-        });
-      }
-    }
-    reloj(pos);
-
-  }
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
-
+    bloqueo=true;
   }
   @override
   void initState() {
-    // TODO: implement initState
+    //Aqui llama a mi funcion inicial de movimiento
    if(this.mounted){
      super.initState();
      mover(-0.5);
@@ -74,6 +55,7 @@ class _InicioState extends State<Inicio> {
             height: heigthpage*0.5,
             child:Column(
               children: <Widget>[
+                //Aqui se meustran los xp del jugador
                 Container(
                   height: heigthpage*0.15,
                   child: Column(
@@ -81,6 +63,8 @@ class _InicioState extends State<Inicio> {
                     children:[Text(widget.profile.xp.toString()+" XP",style: TextStyle(fontSize: size.height*0.05,color: color6),),]
                   )
                 ),
+
+                //Aqui le muestra la corona que tiene el jugador dependiendo de su xp
                 Container(
                   height: heigthpage*0.28,
                   child: Stack(
@@ -93,6 +77,7 @@ class _InicioState extends State<Inicio> {
                     ],
                   )
                 ),
+                //Aqui le muestra la leyenda de su estatus dependiendo del xp que tenga
                 Container(
                   width: size.width,
                   color: color3,
@@ -104,6 +89,7 @@ class _InicioState extends State<Inicio> {
               ],
             )
           ),
+          //Aqui estan lso widgets de recursos del jugador de oro y diamantes
           Container(
             height: heigthpage*0.5,
             child: Row(
@@ -139,6 +125,36 @@ class _InicioState extends State<Inicio> {
         ],
       )
     );
+  }
+  //Hilo de espera para poder mover las coronas y los recursos
+  Future reloj(pos)async {
+    Completer c=Completer();
+    Timer(Duration(milliseconds: dirmovi==1?40:40),(){
+      c.complete(mover(pos+dirmovi*0.01));
+    });
+  }
+
+  //Funcion para mover la posicion de la corona
+  mover(pos){
+    if(!bloqueo){
+      setState(() {
+        posiCorona=pos;
+      });
+      if(pos<=-0.1){
+        setState(() {
+
+          dirmovi=1;
+        });
+      }else{
+        if(pos>=0.1){
+          setState(() {
+
+            dirmovi=-1;
+          });
+        }
+      }
+      reloj(pos);
+    }
   }
 
 }

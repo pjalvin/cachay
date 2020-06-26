@@ -1,3 +1,5 @@
+
+//Aqui esta mi main principal donde se crea mi app
 import 'package:cachay/User/Auth.dart';
 import 'package:cachay/alerts/Alerts.dart';
 import 'package:cachay/game/mainGame.dart';
@@ -28,63 +30,10 @@ final color4= Color(int.parse("F4D6CC",radix: 16)).withOpacity(1.0);
 final color5= Color(int.parse("F4B860",radix: 16)).withOpacity(1.0);
 final color6= Colors.white;
 final color7= Colors.black;
-class MainCacho extends StatefulWidget {
-  @override
-  _MainCachoState createState() => _MainCachoState();
-}
-
-class _MainCachoState extends State<MainCacho> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    //AuthUser().cerrarSesion(context);
-    AuthUser().verinicio(context);
-  }
-  @override
-  Widget build(BuildContext context) {
-    Size size=MediaQuery.of(context).size;
-    return /*SplashScreen(
-      backgroundColor: color2,
-      photoSize: size.width*0.2,
-      image: Image.asset("assets/logo.png",),
-      seconds: 60,
-      loaderColor: color3,
-
-      navigateAfterSeconds: MyApp()
-    );*/
-    Scaffold(
-      backgroundColor: color2,
-      body: ListView(
-        children: <Widget>[
-          Container(
-            height: size.height*0.5,
-            width: size.width,
-            child:Center(
-              child: Image(image:AssetImage("assets/logo.png"),height: size.width*0.4,width: size.width*0.4,),
-            )
-
-          ),
-          Container(
-            height: size.height*0.5,
-            width: size.width*0.7,
-            child:Center(
-              child: LinearProgressIndicator(
-                  backgroundColor: color3,
-
-                  valueColor: new AlwaysStoppedAnimation<Color>(color5),
-              )
-              )
-          )
-        ],
-      ),
-    );
-  }
 
 
 
 
 
 
-}
 

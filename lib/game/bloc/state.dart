@@ -11,11 +11,28 @@ class GameInit extends GameState{
   List<Object> get props => [];
 }
 class GameLoading extends GameState{
+  final Game game;
 
-  const GameLoading();
+  const GameLoading({@required this.game});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [game];
+}
+class GameLoadingCrono extends GameState{
+  final Game game;
+
+  const GameLoadingCrono ({@required this.game});
+
+  @override
+  List<Object> get props => [game];
+}
+class GameLoading2 extends GameState{
+  final Game game;
+
+  const GameLoading2({@required this.game});
+
+  @override
+  List<Object> get props => [game];
 }
 class GameLoaded extends GameState {
   final Game game;
